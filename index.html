@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Marcelo Santos</title>
+<meta name="description" content="Marcelo Santos — Suporte Técnico, ITSM, Gestão de Acessos, Redes e Automação de processos de TI.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b0d10; --surface:#12161b; --surface-2:#171c22; --line:#232a32;
+    --text:#e8edf2; --muted:#8b96a3; --accent:#3ddc97; --accent-2:#4aa8ff;
+  }
+  @media (prefers-color-scheme: light){
+    :root:not([data-theme="dark"]){
+      --bg:#f6f7f9; --surface:#ffffff; --surface-2:#f0f2f5; --line:#e2e6eb;
+      --text:#12161b; --muted:#5b6672; --accent:#0e9f6e; --accent-2:#1d6fd6;
+    }
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:980px;margin:0 auto;padding:0 20px}
+  .mono{font-family:"JetBrains Mono",monospace}
+
+  /* NAV */
+  nav{position:sticky;top:0;z-index:10;backdrop-filter:blur(10px);background:color-mix(in srgb,var(--bg) 80%,transparent);border-bottom:1px solid var(--line)}
+  nav .wrap{display:flex;justify-content:space-between;align-items:center;height:60px}
+  .logo{font-weight:700;letter-spacing:-.02em}
+  .logo span{color:var(--accent)}
+  .links{display:flex;gap:22px;font-size:.92rem;color:var(--muted)}
+  .links a:hover{color:var(--text)}
+
+  /* HERO */
+  header{padding:96px 0 72px}
+  .tag{display:inline-flex;align-items:center;gap:8px;font-size:.8rem;color:var(--accent);border:1px solid var(--line);background:var(--surface);padding:6px 12px;border-radius:999px;margin-bottom:24px}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 25%,transparent)}
+  h1{font-size:clamp(2.4rem,6vw,3.8rem);line-height:1.05;letter-spacing:-.035em;font-weight:700}
+  h1 em{font-style:normal;background:linear-gradient(90deg,var(--accent),var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lead{margin-top:20px;max-width:600px;color:var(--muted);font-size:1.1rem}
+  .cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
+  .btn{padding:12px 20px;border-radius:10px;font-weight:600;font-size:.95rem;border:1px solid var(--line);background:var(--surface);transition:.2s}
+  .btn:hover{border-color:var(--accent)}
+  .btn.primary{background:var(--accent);color:#06130d;border-color:var(--accent)}
+  .btn.primary:hover{filter:brightness(1.08)}
+
+  /* SECTIONS */
+  section{padding:64px 0;border-top:1px solid var(--line)}
+  .sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:32px}
+  .sec-head .num{color:var(--accent);font-size:.85rem}
+  h2{font-size:1.6rem;letter-spacing:-.02em}
+
+  /* PROJECTS */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:10px;transition:.25s}
+  .card:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--accent) 60%,var(--line))}
+  .card .icon{font-size:1.5rem}
+  .card h3{font-size:1.05rem;letter-spacing:-.01em}
+  .card p{color:var(--muted);font-size:.92rem;flex:1}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{font-size:.74rem;padding:4px 9px;border-radius:6px;background:var(--surface-2);border:1px solid var(--line);color:var(--muted)}
+
+  /* SKILLS */
+  .skills{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+  .skill{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px}
+  .skill h3{font-size:.95rem;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+  .skill h3::before{content:"";width:6px;height:6px;border-radius:2px;background:var(--accent)}
+
+  /* EXPERIENCE */
+  .timeline{display:flex;flex-direction:column;gap:14px}
+  .job{display:grid;grid-template-columns:160px 1fr;gap:20px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px}
+  .job .when{color:var(--muted);font-size:.85rem}
+  .job h3{font-size:1.05rem}
+  .job .where{color:var(--accent);font-size:.9rem;margin-bottom:8px}
+  .job p{color:var(--muted);font-size:.92rem}
+
+  /* CONTACT */
+  .contact{text-align:center;padding:80px 0}
+  .contact p{color:var(--muted);margin:12px auto 28px;max-width:460px}
+  .contact .cta{justify-content:center}
+  footer{border-top:1px solid var(--line);padding:24px 0;text-align:center;color:var(--muted);font-size:.82rem}
+
+  /* REVEAL */
+  .reveal{opacity:0;transform:translateY(14px);transition:opacity .6s ease,transform .6s ease}
+  .reveal.in{opacity:1;transform:none}
+
+  @media (max-width:640px){
+    .links{display:none}
+    header{padding:64px 0 48px}
+    .job{grid-template-columns:1fr;gap:6px}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="#" class="logo">marcelo<span>.</span>santos</a>
+    <div class="links">
+      <a href="#projetos">Projetos</a>
+      <a href="#competencias">Competências</a>
+      <a href="#experiencia">Experiência</a>
+      <a href="#contato">Contato</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <header>
+    <div class="tag mono"><span class="dot"></span>Aberto a oportunidades em ITSM, IAM e Redes</div>
+    <h1>Marcelo Santos<br><em>Suporte que automatiza.</em></h1>
+    <p class="lead">Analista de Suporte Técnico na SONDA. Resolvo problemas no dia a dia e transformo processos manuais em sistemas que a equipe usa.</p>
+    <div class="cta">
+      <a class="btn primary" href="#projetos">Ver projetos</a>
+      <a class="btn" href="www.linkedin.com/in/marcelo-santos-3aa7a522b" target="_blank" rel="noopener">LinkedIn</a>
+      <a class="btn" href="https://github.com/marcelosntos" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </header>
+
+  <section id="projetos">
+    <div class="sec-head reveal"><span class="num mono">01</span><h2>Projetos</h2></div>
+    <div class="grid">
+
+      <article class="card reveal">
+        <div class="icon">📊</div>
+        <h3>Dashboard Field x Microinformática</h3>
+        <p>Web app que une as duas equipes: a Micro registra, o Field formata e tudo vira painel em tempo real, integrado ao controle de estoque.</p>
+        <div class="chips"><span class="chip">Apps Script</span><span class="chip">Google Sheets</span><span class="chip">HTML/CSS/JS</span></div>
+      </article>
+
+      <article class="card reveal">
+        <div class="icon">💻</div>
+        <h3>Controle de formatação</h3>
+        <p>Cadastro de equipamentos formatados por técnico, com dashboard semanal e relatório automático toda sexta para a coordenação.</p>
+        <div class="chips"><span class="chip">Python</span><span class="chip">Render</span><span class="chip">Relatórios</span></div>
+      </article>
+
+      <article class="card reveal">
+        <div class="icon">📱</div>
+        <h3>App de atendimentos</h3>
+        <p>Registro de atendimentos sem chamado em segundos, acessado por QR Code direto do celular.</p>
+        <div class="chips"><span class="chip">AppSheet</span><span class="chip">QR Code</span></div>
+      </article>
+
+      <article class="card reveal">
+        <div class="icon">📝</div>
+        <h3>Termo de formatação digital</h3>
+        <p>Formulário com checklist e foto que gera PDF e envia e-mail automático ao colaborador, com o analista em cópia.</p>
+        <div class="chips"><span class="chip">Google Forms</span><span class="chip">Apps Script</span><span class="chip">PDF</span></div>
+      </article>
+
+      <article class="card reveal">
+        <div class="icon">🛒</div>
+        <h3>Catálogo de notebooks</h3>
+        <p>Site para cliente que lê o estoque de uma planilha e exibe produtos em cards, com fotos e botão direto para o WhatsApp.</p>
+        <div class="chips"><span class="chip">Freela</span><span class="chip">Google Sheets</span><span class="chip">JavaScript</span></div>
+      </article>
+
+      <article class="card reveal">
+        <div class="icon">📺</div>
+        <h3>Painel de TV</h3>
+        <p>Slides em HTML rodando na TV da equipe, alternando dashboard e comunicados automaticamente.</p>
+        <div class="chips"><span class="chip">HTML</span><span class="chip">Apps Script</span></div>
+      </article>
+
+    </div>
+  </section>
+
+  <section id="competencias">
+    <div class="sec-head reveal"><span class="num mono">02</span><h2>Competências</h2></div>
+    <div class="skills">
+      <div class="skill reveal">
+        <h3>ITSM</h3>
+        <div class="chips"><span class="chip">ServiceNow</span><span class="chip">Incidentes</span><span class="chip">Requisições</span><span class="chip">ITIL</span></div>
+      </div>
+      <div class="skill reveal">
+        <h3>Gestão de Acessos</h3>
+        <div class="chips"><span class="chip">Active Directory</span><span class="chip">PowerShell</span><span class="chip">Entra ID</span></div>
+      </div>
+      <div class="skill reveal">
+        <h3>Redes</h3>
+        <div class="chips"><span class="chip">Cisco</span><span class="chip">VLAN</span><span class="chip">LLDP/CDP</span><span class="chip">VPN</span></div>
+      </div>
+      <div class="skill reveal">
+        <h3>Endpoint</h3>
+        <div class="chips"><span class="chip">Intune</span><span class="chip">Autopilot</span><span class="chip">BitLocker</span><span class="chip">Windows / macOS</span></div>
+      </div>
+      <div class="skill reveal">
+        <h3>Automação</h3>
+        <div class="chips"><span class="chip">Apps Script</span><span class="chip">AppSheet</span><span class="chip">Python</span><span class="chip">HTML/CSS/JS</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="experiencia">
+    <div class="sec-head reveal"><span class="num mono">03</span><h2>Experiência</h2></div>
+    <div class="timeline">
+      <div class="job reveal">
+        <div class="when mono">20XX — atual</div>
+        <div>
+          <h3>Analista de Suporte Técnico (Field)</h3>
+          <div class="where">SONDA</div>
+          <p>Suporte em ambiente corporativo de grande porte: chamados no ServiceNow, Active Directory, dispositivos Intune/Autopilot e apoio ao time de Network. Criador das ferramentas internas usadas pela equipe.</p>
+        </div>
+      </div>
+      <div class="job reveal">
+        <div class="when mono">Freelance</div>
+        <div>
+          <h3>Desenvolvedor de soluções web</h3>
+          <div class="where">Projetos independentes</div>
+          <p>Sites, catálogos e formulários automatizados para pequenas empresas.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contato" class="contact">
+    <h2 class="reveal">Vamos conversar?</h2>
+    <p class="reveal">Procuro oportunidades em ITSM, Gestão de Acessos e Redes.</p>
+    <div class="cta reveal">
+      <a class="btn primary" href="marcelogabrielsantos1103@gmail.com">Enviar e-mail</a>
+      <a class="btn" href="https://www.linkedin.com/in/marcelo-santos-3aa7a522b/" target="_blank" rel="noopener">LinkedIn</a>
+    </div>
+  </section>
+
+</div>
+
+<footer>© <span id="ano"></span> Marcelo Santos</footer>
+
+<script>
+  document.getElementById('ano').textContent = new Date().getFullYear();
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: .12 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+</body>
+</html>
