@@ -22,6 +22,7 @@
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
   body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+  body.no-scroll{overflow:hidden}
   a{color:inherit;text-decoration:none}
   .wrap{max-width:980px;margin:0 auto;padding:0 20px}
   .mono{font-family:"JetBrains Mono",monospace}
@@ -42,7 +43,7 @@
   h1 em{font-style:normal;background:linear-gradient(90deg,var(--accent),var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent}
   .lead{margin-top:20px;max-width:600px;color:var(--muted);font-size:1.1rem}
   .cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
-  .btn{padding:12px 20px;border-radius:10px;font-weight:600;font-size:.95rem;border:1px solid var(--line);background:var(--surface);transition:.2s}
+  .btn{padding:12px 20px;border-radius:10px;font-weight:600;font-size:.95rem;border:1px solid var(--line);background:var(--surface);color:var(--text);transition:.2s;cursor:pointer;font-family:inherit}
   .btn:hover{border-color:var(--accent)}
   .btn.primary{background:var(--accent);color:#06130d;border-color:var(--accent)}
   .btn.primary:hover{filter:brightness(1.08)}
@@ -51,15 +52,18 @@
   section{padding:64px 0;border-top:1px solid var(--line)}
   .sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:32px}
   .sec-head .num{color:var(--accent);font-size:.85rem}
+  .sec-head small{color:var(--muted);font-size:.85rem;margin-left:auto}
   h2{font-size:1.6rem;letter-spacing:-.02em}
 
   /* PROJECTS */
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
-  .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:10px;transition:.25s}
-  .card:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--accent) 60%,var(--line))}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:10px;transition:.25s;cursor:pointer;text-align:left;font-family:inherit;color:inherit;width:100%}
+  .card:hover,.card:focus-visible{transform:translateY(-3px);border-color:color-mix(in srgb,var(--accent) 60%,var(--line));outline:none}
   .card .icon{font-size:1.5rem}
   .card h3{font-size:1.05rem;letter-spacing:-.01em}
   .card p{color:var(--muted);font-size:.92rem;flex:1}
+  .card .see{font-size:.8rem;color:var(--accent);font-weight:600;opacity:.75;transition:.2s}
+  .card:hover .see{opacity:1}
   .chips{display:flex;flex-wrap:wrap;gap:6px}
   .chip{font-size:.74rem;padding:4px 9px;border-radius:6px;background:var(--surface-2);border:1px solid var(--line);color:var(--muted)}
 
@@ -83,6 +87,23 @@
   .contact .cta{justify-content:center}
   footer{border-top:1px solid var(--line);padding:24px 0;text-align:center;color:var(--muted);font-size:.82rem}
 
+  /* MODAL DE PRÉVIA */
+  .modal{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(0,0,0,.65);backdrop-filter:blur(4px)}
+  .modal.open{display:flex;animation:fade .2s ease}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  .modal-box{width:min(1100px,100%);height:min(720px,100%);background:var(--surface);border:1px solid var(--line);border-radius:16px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+  .modal-bar{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--surface-2)}
+  .dots{display:flex;gap:6px}
+  .dots i{width:11px;height:11px;border-radius:50%;background:var(--line)}
+  .dots i:nth-child(1){background:#ff5f57}.dots i:nth-child(2){background:#febc2e}.dots i:nth-child(3){background:#28c840}
+  .modal-title{font-weight:600;font-size:.95rem;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .modal-bar .btn{padding:7px 12px;font-size:.82rem}
+  .modal-body{flex:1;position:relative;background:#fff}
+  .modal-body iframe{width:100%;height:100%;border:0;display:block}
+  .empty{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:24px;background:var(--surface);color:var(--muted)}
+  .empty.show{display:flex}
+  .empty b{color:var(--text);font-size:1.1rem}
+
   /* REVEAL */
   .reveal{opacity:0;transform:translateY(14px);transition:opacity .6s ease,transform .6s ease}
   .reveal.in{opacity:1;transform:none}
@@ -91,6 +112,10 @@
     .links{display:none}
     header{padding:64px 0 48px}
     .job{grid-template-columns:1fr;gap:6px}
+    .sec-head small{display:none}
+    .modal{padding:0}
+    .modal-box{height:100%;border-radius:0}
+    .dots{display:none}
   }
 </style>
 </head>
@@ -116,56 +141,64 @@
     <p class="lead">Analista de Suporte Técnico na SONDA. Resolvo problemas no dia a dia e transformo processos manuais em sistemas que a equipe usa.</p>
     <div class="cta">
       <a class="btn primary" href="#projetos">Ver projetos</a>
-      <a class="btn" href="www.linkedin.com/in/marcelo-santos-3aa7a522b" target="_blank" rel="noopener">LinkedIn</a>
+      <a class="btn" href="https://www.linkedin.com/in/marcelo-santos-3aa7a522b/" target="_blank" rel="noopener">LinkedIn</a>
       <a class="btn" href="https://github.com/marcelosntos" target="_blank" rel="noopener">GitHub</a>
     </div>
   </header>
 
   <section id="projetos">
-    <div class="sec-head reveal"><span class="num mono">01</span><h2>Projetos</h2></div>
+    <div class="sec-head reveal"><span class="num mono">01</span><h2>Projetos</h2><small>Clique para ver a prévia</small></div>
     <div class="grid">
 
-      <article class="card reveal">
+      <!-- data-preview = caminho do index do projeto (pasta no repositório) ou um link completo https:// -->
+
+      <button class="card reveal" data-title="Dashboard Field x Microinformática" data-preview="projetos/dashboard/index.html">
         <div class="icon">📊</div>
         <h3>Dashboard Field x Microinformática</h3>
         <p>Web app que une as duas equipes: a Micro registra, o Field formata e tudo vira painel em tempo real, integrado ao controle de estoque.</p>
         <div class="chips"><span class="chip">Apps Script</span><span class="chip">Google Sheets</span><span class="chip">HTML/CSS/JS</span></div>
-      </article>
+        <span class="see">Ver prévia →</span>
+      </button>
 
-      <article class="card reveal">
+      <button class="card reveal" data-title="Controle de formatação" data-preview="projetos/formatacao/index.html">
         <div class="icon">💻</div>
         <h3>Controle de formatação</h3>
         <p>Cadastro de equipamentos formatados por técnico, com dashboard semanal e relatório automático toda sexta para a coordenação.</p>
         <div class="chips"><span class="chip">Python</span><span class="chip">Render</span><span class="chip">Relatórios</span></div>
-      </article>
+        <span class="see">Ver prévia →</span>
+      </button>
 
-      <article class="card reveal">
+      <button class="card reveal" data-title="App de atendimentos" data-preview="projetos/atendimentos/index.html">
         <div class="icon">📱</div>
         <h3>App de atendimentos</h3>
         <p>Registro de atendimentos sem chamado em segundos, acessado por QR Code direto do celular.</p>
         <div class="chips"><span class="chip">AppSheet</span><span class="chip">QR Code</span></div>
-      </article>
+        <span class="see">Ver prévia →</span>
+      </button>
 
-      <article class="card reveal">
+      <button class="card reveal" data-title="Termo de formatação digital" data-preview="projetos/termo/index.html">
         <div class="icon">📝</div>
         <h3>Termo de formatação digital</h3>
         <p>Formulário com checklist e foto que gera PDF e envia e-mail automático ao colaborador, com o analista em cópia.</p>
         <div class="chips"><span class="chip">Google Forms</span><span class="chip">Apps Script</span><span class="chip">PDF</span></div>
-      </article>
+        <span class="see">Ver prévia →</span>
+      </button>
 
-      <article class="card reveal">
+      <button class="card reveal" data-title="Catálogo de notebooks" data-preview="projetos/catalogo/index.html">
         <div class="icon">🛒</div>
         <h3>Catálogo de notebooks</h3>
         <p>Site para cliente que lê o estoque de uma planilha e exibe produtos em cards, com fotos e botão direto para o WhatsApp.</p>
         <div class="chips"><span class="chip">Freela</span><span class="chip">Google Sheets</span><span class="chip">JavaScript</span></div>
-      </article>
+        <span class="see">Ver prévia →</span>
+      </button>
 
-      <article class="card reveal">
+      <button class="card reveal" data-title="Painel de TV" data-preview="projetos/painel-tv/index.html">
         <div class="icon">📺</div>
         <h3>Painel de TV</h3>
         <p>Slides em HTML rodando na TV da equipe, alternando dashboard e comunicados automaticamente.</p>
         <div class="chips"><span class="chip">HTML</span><span class="chip">Apps Script</span></div>
-      </article>
+        <span class="see">Ver prévia →</span>
+      </button>
 
     </div>
   </section>
@@ -222,7 +255,7 @@
     <h2 class="reveal">Vamos conversar?</h2>
     <p class="reveal">Procuro oportunidades em ITSM, Gestão de Acessos e Redes.</p>
     <div class="cta reveal">
-      <a class="btn primary" href="marcelogabrielsantos1103@gmail.com">Enviar e-mail</a>
+      <a class="btn primary" href="mailto:marcelogabrielsantos1103@gmail.com">Enviar e-mail</a>
       <a class="btn" href="https://www.linkedin.com/in/marcelo-santos-3aa7a522b/" target="_blank" rel="noopener">LinkedIn</a>
     </div>
   </section>
@@ -231,12 +264,85 @@
 
 <footer>© <span id="ano"></span> Marcelo Santos</footer>
 
+<!-- MODAL DE PRÉVIA -->
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal-box">
+    <div class="modal-bar">
+      <div class="dots"><i></i><i></i><i></i></div>
+      <div class="modal-title" id="modal-title">Projeto</div>
+      <a class="btn" id="modal-open" href="#" target="_blank" rel="noopener">Abrir em nova aba ↗</a>
+      <button class="btn" id="modal-close" aria-label="Fechar">✕</button>
+    </div>
+    <div class="modal-body">
+      <iframe id="modal-frame" title="Prévia do projeto" loading="lazy"></iframe>
+      <div class="empty" id="modal-empty">
+        <div style="font-size:2rem">🛠️</div>
+        <b>Prévia em breve</b>
+        <span>Estou preparando uma versão de demonstração deste projeto.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
   document.getElementById('ano').textContent = new Date().getFullYear();
+
+  // Animação de entrada
   const io = new IntersectionObserver(entries => {
     entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
   }, { threshold: .12 });
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // Prévia dos projetos
+  const modal  = document.getElementById('modal');
+  const frame  = document.getElementById('modal-frame');
+  const empty  = document.getElementById('modal-empty');
+  const title  = document.getElementById('modal-title');
+  const openBt = document.getElementById('modal-open');
+
+  function mostrarVazio(){
+    frame.removeAttribute('src');
+    empty.classList.add('show');
+    openBt.style.display = 'none';
+  }
+
+  function mostrarPrevia(url){
+    empty.classList.remove('show');
+    frame.src = url;
+    openBt.href = url;
+    openBt.style.display = '';
+  }
+
+  async function abrir(card){
+    const url = card.dataset.preview;
+    title.textContent = card.dataset.title;
+    modal.classList.add('open');
+    document.body.classList.add('no-scroll');
+
+    if (!url) return mostrarVazio();
+
+    // Link externo: abre direto
+    if (/^https?:\/\//.test(url)) return mostrarPrevia(url);
+
+    // Arquivo do próprio site: confere se existe antes, pra não mostrar 404
+    try {
+      const r = await fetch(url, { method: 'HEAD', cache: 'no-store' });
+      r.ok ? mostrarPrevia(url) : mostrarVazio();
+    } catch {
+      mostrarPrevia(url); // aberto direto do Finder (file://), sem como checar
+    }
+  }
+
+  function fechar(){
+    modal.classList.remove('open');
+    document.body.classList.remove('no-scroll');
+    frame.removeAttribute('src');
+  }
+
+  document.querySelectorAll('.card[data-title]').forEach(c => c.addEventListener('click', () => abrir(c)));
+  document.getElementById('modal-close').addEventListener('click', fechar);
+  modal.addEventListener('click', e => { if (e.target === modal) fechar(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && modal.classList.contains('open')) fechar(); });
 </script>
 </body>
 </html>
