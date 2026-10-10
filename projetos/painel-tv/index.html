@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Painel de TV — Demo</title>
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:#000;font-family:-apple-system,Inter,Arial,sans-serif;overflow:hidden}
+  .tv{position:relative;width:100%;height:100%;color:#fff}
+  .slide{position:absolute;inset:0;padding:5vh 5vw;display:flex;flex-direction:column;opacity:0;transform:scale(1.02);transition:opacity 1s,transform 1s}
+  .slide.on{opacity:1;transform:none}
+  .top{display:flex;justify-content:space-between;align-items:center;font-size:clamp(12px,1.6vw,20px);opacity:.85}
+  .clock{font-variant-numeric:tabular-nums;font-weight:700}
+  h1{font-size:clamp(26px,4.5vw,64px);margin:4vh 0 3vh;line-height:1.05}
+  .s1{background:radial-gradient(circle at 80% 10%,#1d4ed8,#0b1023 60%)}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:2vw;flex:1;align-content:center}
+  .k{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:2vw;padding:3vh 2vw}
+  .k small{font-size:clamp(11px,1.3vw,18px);opacity:.7;text-transform:uppercase}
+  .k b{display:block;font-size:clamp(30px,6vw,90px);line-height:1.1;margin-top:1vh}
+  .k i{display:block;height:6px;border-radius:3px;margin-top:2vh}
+  .s2{background:linear-gradient(135deg,#7c3aed,#db2777)}
+  .aviso{flex:1;display:flex;flex-direction:column;justify-content:center;max-width:70%}
+  .aviso p{font-size:clamp(16px,2.4vw,34px);line-height:1.4;opacity:.92;margin:0}
+  .badge{display:inline-block;background:rgba(255,255,255,.2);padding:.6vh 1.2vw;border-radius:999px;font-size:clamp(11px,1.3vw,18px);margin-bottom:2vh;width:fit-content}
+  .s3{background:linear-gradient(135deg,#065f46,#0f766e)}
+  .plantao{display:grid;grid-template-columns:repeat(3,1fr);gap:2vw;flex:1;align-content:center}
+  .pc{background:rgba(0,0,0,.2);border-radius:2vw;padding:3vh 2vw;text-align:center}
+  .av{width:clamp(50px,8vw,120px);height:clamp(50px,8vw,120px);border-radius:50%;margin:0 auto 2vh;display:flex;align-items:center;justify-content:center;font-size:clamp(20px,3vw,44px);font-weight:800;background:rgba(255,255,255,.18)}
+  .pc b{font-size:clamp(14px,2vw,30px);display:block}
+  .pc small{font-size:clamp(11px,1.4vw,20px);opacity:.8}
+  .dots{position:absolute;bottom:3vh;left:0;right:0;display:flex;justify-content:center;gap:10px;z-index:2}
+  .dots i{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.3);transition:.3s}
+  .dots i.on{background:#fff;width:28px;border-radius:5px}
+  .prog{position:absolute;top:0;left:0;height:4px;background:#fff;z-index:2;width:0}
+  .demo{position:absolute;bottom:3vh;right:3vw;font-size:11px;opacity:.5;z-index:2}
+</style>
+</head>
+<body>
+<div class="tv">
+  <div class="prog" id="prog"></div>
+
+  <section class="slide s1 on">
+    <div class="top"><span>📊 Indicadores da semana</span><span class="clock"></span></div>
+    <h1>Operação de suporte</h1>
+    <div class="kpis">
+      <div class="k"><small>Formatados</small><b data-n="128">0</b><i style="background:#22c55e"></i></div>
+      <div class="k"><small>Em processo</small><b data-n="17">0</b><i style="background:#3b82f6"></i></div>
+      <div class="k"><small>Atendimentos</small><b data-n="342">0</b><i style="background:#a855f7"></i></div>
+      <div class="k"><small>SLA no prazo</small><b data-n="96" data-s="%">0</b><i style="background:#f59e0b"></i></div>
+    </div>
+  </section>
+
+  <section class="slide s2">
+    <div class="top"><span>📣 Comunicado</span><span class="clock"></span></div>
+    <div class="aviso">
+      <span class="badge">Atenção</span>
+      <h1>Janela de manutenção na sexta</h1>
+      <p>A rede Wi-Fi do andar 2 passará por manutenção das 19h às 21h. Equipamentos via cabo não serão afetados.</p>
+    </div>
+  </section>
+
+  <section class="slide s3">
+    <div class="top"><span>🧑‍💻 Plantão do fim de semana</span><span class="clock"></span></div>
+    <h1>Quem está de plantão</h1>
+    <div class="plantao">
+      <div class="pc"><div class="av">AR</div><b>Ana Ribeiro</b><small>Sábado · 8h às 14h</small></div>
+      <div class="pc"><div class="av">BL</div><b>Bruno Lima</b><small>Sábado · 14h às 20h</small></div>
+      <div class="pc"><div class="av">CM</div><b>Carla Mendes</b><small>Domingo · 8h às 14h</small></div>
+    </div>
+  </section>
+
+  <div class="dots" id="dots"></div>
+  <div class="demo">Demo · dados fictícios</div>
+</div>
+
+<script>
+  const slides = [...document.querySelectorAll('.slide')];
+  const dots = document.getElementById('dots');
+  const prog = document.getElementById('prog');
+  const TEMPO = 6000;
+  dots.innerHTML = slides.map((_, i) => `<i class="${i ? '' : 'on'}"></i>`).join('');
+  let atual = 0;
+
+  function contar() {
+    document.querySelectorAll('[data-n]').forEach(el => {
+      const alvo = +el.dataset.n, suf = el.dataset.s || '';
+      const ini = performance.now();
+      const passo = t => {
+        const p = Math.min((t - ini) / 1200, 1);
+        el.textContent = Math.round(alvo * (1 - Math.pow(1 - p, 3))) + suf;
+        if (p < 1) requestAnimationFrame(passo);
+      };
+      requestAnimationFrame(passo);
+    });
+  }
+
+  function barra() {
+    prog.style.transition = 'none'; prog.style.width = '0';
+    requestAnimationFrame(() => requestAnimationFrame(() => { prog.style.transition = `width ${TEMPO}ms linear`; prog.style.width = '100%'; }));
+  }
+
+  function proximo() {
+    slides[atual].classList.remove('on'); dots.children[atual].classList.remove('on');
+    atual = (atual + 1) % slides.length;
+    slides[atual].classList.add('on'); dots.children[atual].classList.add('on');
+    if (atual === 0) contar();
+    barra();
+  }
+
+  function relogio() {
+    const t = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    document.querySelectorAll('.clock').forEach(c => c.textContent = t);
+  }
+
+  relogio(); setInterval(relogio, 10000);
+  contar(); barra();
+  setInterval(proximo, TEMPO);
+</script>
+</body>
+</html>

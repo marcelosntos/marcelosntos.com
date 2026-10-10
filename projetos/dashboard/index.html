@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gestão de Equipamentos — Demo</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,Inter,Arial,sans-serif;background:linear-gradient(135deg,#f4f7fb,#edf3f8);color:#17202a}
+  .app{display:flex;min-height:100vh}
+  .sidebar{width:230px;flex-shrink:0;background:linear-gradient(180deg,#0c2a46,#12395c);color:#fff;padding:24px 18px;position:sticky;top:0;height:100vh}
+  .logo{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,#55a8ff,#1f70bd);display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:14px}
+  .sidebar h2{margin:0;font-size:18px;line-height:1.25}
+  .sidebar p{margin:6px 0 30px;color:#adc4d8;font-size:12px}
+  .menu{padding:12px 14px;border-radius:10px;color:#c4d4e3;cursor:pointer;font-size:14px;margin-bottom:6px;transition:.2s}
+  .menu:hover{background:rgba(255,255,255,.07);color:#fff}
+  .menu.ativo{background:rgba(255,255,255,.12);color:#fff;font-weight:700;box-shadow:inset 3px 0 0 #58a9f5}
+  .demo{margin-top:30px;font-size:11px;color:#89a8c1;border-top:1px solid rgba(255,255,255,.1);padding-top:14px;line-height:1.5}
+  main{flex:1;padding:28px;min-width:0}
+  h1{margin:0;color:#102e4a;font-size:26px}
+  .sub{margin:6px 0 22px;color:#7d8da0;font-size:13px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:18px}
+  .card{background:#fff;border-radius:15px;padding:18px;box-shadow:0 6px 24px rgba(20,48,75,.07)}
+  .card small{color:#7b8997;font-size:11px;font-weight:700;text-transform:uppercase}
+  .card b{display:block;font-size:32px;margin-top:6px;color:#102e4a}
+  .card i{display:block;width:30px;height:4px;border-radius:2px;margin-top:8px}
+  .grid2{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:18px}
+  .painel{background:#fff;border-radius:15px;padding:20px;box-shadow:0 6px 24px rgba(20,48,75,.07)}
+  .painel h3{margin:0 0 4px;font-size:15px;color:#183753}
+  .painel .s{color:#98a2b3;font-size:11px;margin-bottom:14px}
+  .bars{display:flex;align-items:flex-end;gap:10px;height:200px;padding-top:10px}
+  .bar{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%}
+  .bar span{width:100%;max-width:38px;background:linear-gradient(180deg,#4a9ef0,#2477c9);border-radius:7px 7px 3px 3px;transition:height .6s}
+  .bar em{font-style:normal;font-size:11px;color:#738295;margin-top:6px}
+  .bar strong{font-size:12px;color:#183753;margin-bottom:4px}
+  .donut{width:170px;height:170px;border-radius:50%;margin:10px auto;position:relative}
+  .donut::after{content:"";position:absolute;inset:30px;background:#fff;border-radius:50%}
+  .donut .c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:1;font-size:12px;color:#7b8997}
+  .donut .c b{font-size:28px;color:#102e4a}
+  .leg{display:flex;flex-wrap:wrap;gap:8px 14px;justify-content:center;font-size:12px;color:#536170}
+  .leg span::before{content:"";display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:5px;background:var(--c)}
+  table{width:100%;border-collapse:collapse}
+  th{text-align:left;padding:10px;color:#8492a3;font-size:11px;text-transform:uppercase;border-bottom:1px solid #edf0f4;white-space:nowrap}
+  td{padding:11px 10px;font-size:13px;border-bottom:1px solid #f0f2f5;white-space:nowrap}
+  .scroll{overflow-x:auto}
+  .badge{padding:5px 10px;border-radius:20px;font-size:11px;font-weight:700}
+  .Pendente{color:#916b00;background:#fff4cc}.Em{color:#175cd3;background:#e8f1ff}.Formatado{color:#11783d;background:#dff5e6}.Erro{color:#b42318;background:#fde5e3}
+  select,input{height:38px;border:1px solid #d6dee8;border-radius:8px;padding:0 10px;background:#fff;font-family:inherit;font-size:13px}
+  .form{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;max-width:760px}
+  .form label{display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700;color:#536579}
+  .form input,.form select{height:44px}
+  .btn{height:42px;border:0;border-radius:10px;padding:0 18px;background:linear-gradient(135deg,#2477c9,#155999);color:#fff;font-weight:700;cursor:pointer;margin-top:16px}
+  .btn.sm{height:34px;margin:0;padding:0 12px;font-size:12px}
+  .msg{margin-top:12px;font-size:13px;font-weight:700;color:#18864b;min-height:18px}
+  .pag{display:none}.pag.on{display:block}
+  @media(max-width:860px){.sidebar{display:none}.grid2,.form{grid-template-columns:1fr}.tabs{display:flex!important}}
+  .tabs{display:none;gap:6px;margin-bottom:16px;overflow-x:auto}
+  .tabs button{border:0;background:#fff;border-radius:8px;padding:8px 12px;font-size:12px;cursor:pointer;white-space:nowrap}
+  .tabs button.ativo{background:#17365d;color:#fff}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="logo">🖥️</div>
+    <h2>Gestão de<br>Equipamentos</h2>
+    <p>Microinformática × Field</p>
+    <div class="menu ativo" data-p="dash">📊 Dashboard Geral</div>
+    <div class="menu" data-p="equip">💻 Equipamentos</div>
+    <div class="menu" data-p="field">🛠️ Field</div>
+    <div class="menu" data-p="micro">📦 Microinformática</div>
+    <div class="demo">Versão de demonstração<br>Dados fictícios</div>
+  </aside>
+
+  <main>
+    <div class="tabs">
+      <button class="ativo" data-p="dash">📊 Dashboard</button>
+      <button data-p="equip">💻 Equipamentos</button>
+      <button data-p="field">🛠️ Field</button>
+      <button data-p="micro">📦 Micro</button>
+    </div>
+
+    <section class="pag on" id="dash">
+      <h1>Dashboard de Equipamentos</h1>
+      <p class="sub">Visão geral do fluxo entre Microinformática e Field</p>
+      <div class="cards" id="cards"></div>
+      <div class="grid2">
+        <div class="painel"><h3>Equipamentos registrados por data</h3><div class="s">Volume de entrada diário</div><div class="bars" id="bars"></div></div>
+        <div class="painel"><h3>Distribuição por status</h3><div class="s">Situação atual</div><div class="donut" id="donut"><div class="c"><b id="dTotal">0</b>equipamentos</div></div><div class="leg" id="leg"></div></div>
+      </div>
+      <div class="painel"><h3>Últimos registros</h3><div class="s">Atualizado em tempo real</div><div class="scroll"><table><thead><tr><th>Data</th><th>Modelo</th><th>Patrimônio</th><th>Destino</th><th>Analista</th><th>Status</th></tr></thead><tbody id="ultimos"></tbody></table></div></div>
+    </section>
+
+    <section class="pag" id="equip">
+      <h1>Equipamentos</h1>
+      <p class="sub">Consulta geral dos registros</p>
+      <input id="busca" placeholder="🔎 Pesquisar modelo, patrimônio, serial ou analista..." style="width:100%;max-width:520px;height:44px;margin-bottom:16px">
+      <div class="painel scroll"><table><thead><tr><th>Data</th><th>Modelo</th><th>Patrimônio</th><th>S/N</th><th>Chamado</th><th>Destino</th><th>Analista</th><th>Status</th></tr></thead><tbody id="geral"></tbody></table></div>
+    </section>
+
+    <section class="pag" id="field">
+      <h1>Gestão Field</h1>
+      <p class="sub">O Field assume o equipamento e atualiza o andamento</p>
+      <div class="painel scroll"><table><thead><tr><th>Modelo</th><th>Patrimônio</th><th>Destino</th><th>Analista Field</th><th>Status</th><th></th></tr></thead><tbody id="tField"></tbody></table></div>
+    </section>
+
+    <section class="pag" id="micro">
+      <h1>Registrar Equipamento</h1>
+      <p class="sub">A Microinformática envia o equipamento para o Field</p>
+      <div class="painel">
+        <div class="form">
+          <label>Modelo<input id="mModelo" placeholder="Ex: Notebook Modelo X"></label>
+          <label>Patrimônio<input id="mPat" placeholder="Ex: 100123"></label>
+          <label>S/N<input id="mSn" placeholder="Ex: SN-ABC123"></label>
+          <label>Destino<select id="mDest"><option value="">Selecione...</option><option>Doação</option><option>Estoque</option><option>Rollout</option></select></label>
+          <label>Chamado aberto?<select id="mCh"><option value="">Selecione...</option><option>Sim</option><option>Não</option></select></label>
+          <label id="lNum" style="display:none">Nº do chamado<input id="mNum" placeholder="Ex: INC0000123"></label>
+        </div>
+        <button class="btn" id="btnReg">📦 Registrar equipamento</button>
+        <div class="msg" id="msg"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+  const ANALISTAS = ['Ana Ribeiro','Bruno Lima','Carla Mendes','Diego Rocha','Eduardo Alves'];
+  const STATUS = ['Pendente','Em Processo','Formatado','Erro'];
+  const CORES = {Pendente:'#e4ad21','Em Processo':'#2f80ed',Formatado:'#27ae60',Erro:'#e05252'};
+  const MODELOS = ['Notebook Modelo A14','Notebook Modelo B15','Ultrabook C13','Desktop D-Mini','Notebook Modelo A14 G2'];
+  const DESTINOS = ['Doação','Estoque','Rollout'];
+
+  // Gera dados fictícios dos últimos 7 dias
+  const hoje = new Date();
+  let seed = 7;
+  const rnd = n => { seed = (seed * 9301 + 49297) % 233280; return Math.floor(seed / 233280 * n); };
+  const dados = [];
+  for (let d = 6; d >= 0; d--) {
+    const qtd = 3 + rnd(6);
+    for (let i = 0; i < qtd; i++) {
+      const dt = new Date(hoje); dt.setDate(hoje.getDate() - d);
+      const st = d > 2 ? (rnd(10) > 1 ? 'Formatado' : 'Erro') : STATUS[rnd(3)];
+      dados.push({
+        data: dt, modelo: MODELOS[rnd(5)], pat: String(100000 + rnd(900000)),
+        sn: 'SN-' + Math.random().toString(36).slice(2, 8).toUpperCase(),
+        chamado: rnd(2) ? 'INC00' + (10000 + rnd(89999)) : 'Não',
+        destino: DESTINOS[rnd(3)], analista: st === 'Pendente' ? '' : ANALISTAS[rnd(5)], status: st
+      });
+    }
+  }
+
+  const fmt = d => d.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'});
+  const badge = s => `<span class="badge ${s.split(' ')[0]}">${s}</span>`;
+
+  function render() {
+    const cont = s => dados.filter(x => x.status === s).length;
+    const comCh = dados.filter(x => x.chamado !== 'Não').length;
+    const cards = [
+      ['Total', dados.length, '#1976d2'], ['Pendentes', cont('Pendente'), '#e5a700'],
+      ['Em processo', cont('Em Processo'), '#2684ff'], ['Formatados', cont('Formatado'), '#24a148'],
+      ['Erros', cont('Erro'), '#d93025'], ['Com chamado', comCh, '#7950f2']
+    ];
+    document.getElementById('cards').innerHTML = cards.map(c => `<div class="card"><small>${c[0]}</small><b>${c[1]}</b><i style="background:${c[2]}"></i></div>`).join('');
+
+    // Barras por data
+    const porDia = {};
+    dados.forEach(x => { const k = fmt(x.data); porDia[k] = (porDia[k] || 0) + 1; });
+    const max = Math.max(...Object.values(porDia));
+    document.getElementById('bars').innerHTML = Object.entries(porDia).map(([k, v]) =>
+      `<div class="bar"><strong>${v}</strong><span style="height:${v / max * 80}%"></span><em>${k}</em></div>`).join('');
+
+    // Donut
+    let acc = 0;
+    const partes = STATUS.map(s => { const p = cont(s) / dados.length * 100; const r = `${CORES[s]} ${acc}% ${acc + p}%`; acc += p; return r; });
+    document.getElementById('donut').style.background = `conic-gradient(${partes.join(',')})`;
+    document.getElementById('dTotal').textContent = dados.length;
+    document.getElementById('leg').innerHTML = STATUS.map(s => `<span style="--c:${CORES[s]}">${s} (${cont(s)})</span>`).join('');
+
+    const ord = [...dados].sort((a, b) => b.data - a.data);
+    document.getElementById('ultimos').innerHTML = ord.slice(0, 6).map(x =>
+      `<tr><td>${fmt(x.data)}</td><td><b>${x.modelo}</b></td><td>${x.pat}</td><td>${x.destino}</td><td>${x.analista || '—'}</td><td>${badge(x.status)}</td></tr>`).join('');
+
+    renderGeral();
+    document.getElementById('tField').innerHTML = ord.filter(x => x.status !== 'Formatado').map(x => {
+      const i = dados.indexOf(x);
+      return `<tr><td><b>${x.modelo}</b></td><td>${x.pat}</td><td>${x.destino}</td>
+        <td><select id="a${i}"><option value="">Selecione...</option>${ANALISTAS.map(a => `<option ${a === x.analista ? 'selected' : ''}>${a}</option>`).join('')}</select></td>
+        <td><select id="s${i}">${STATUS.map(s => `<option ${s === x.status ? 'selected' : ''}>${s}</option>`).join('')}</select></td>
+        <td><button class="btn sm" onclick="salvar(${i})">Salvar</button></td></tr>`;
+    }).join('') || '<tr><td colspan="6" style="text-align:center;color:#98a2b3;padding:30px">Tudo formatado 🎉</td></tr>';
+  }
+
+  function renderGeral() {
+    const q = document.getElementById('busca').value.toLowerCase();
+    document.getElementById('geral').innerHTML = [...dados].sort((a, b) => b.data - a.data)
+      .filter(x => [x.modelo, x.pat, x.sn, x.analista].join(' ').toLowerCase().includes(q))
+      .map(x => `<tr><td>${fmt(x.data)}</td><td><b>${x.modelo}</b></td><td>${x.pat}</td><td>${x.sn}</td><td>${x.chamado}</td><td>${x.destino}</td><td>${x.analista || '—'}</td><td>${badge(x.status)}</td></tr>`).join('');
+  }
+
+  function salvar(i) {
+    const a = document.getElementById('a' + i).value;
+    if (!a) return alert('Selecione o analista Field.');
+    dados[i].analista = a;
+    dados[i].status = document.getElementById('s' + i).value;
+    render();
+  }
+
+  function abrir(p) {
+    document.querySelectorAll('.pag').forEach(x => x.classList.toggle('on', x.id === p));
+    document.querySelectorAll('[data-p]').forEach(x => x.classList.toggle('ativo', x.dataset.p === p));
+  }
+  document.querySelectorAll('[data-p]').forEach(x => x.addEventListener('click', () => abrir(x.dataset.p)));
+  document.getElementById('busca').addEventListener('input', renderGeral);
+  document.getElementById('mCh').addEventListener('change', e => document.getElementById('lNum').style.display = e.target.value === 'Sim' ? 'flex' : 'none');
+
+  document.getElementById('btnReg').addEventListener('click', () => {
+    const v = id => document.getElementById(id).value.trim();
+    const msg = document.getElementById('msg');
+    if (!v('mModelo') || !v('mPat') || !v('mSn') || !v('mDest') || !v('mCh') || (v('mCh') === 'Sim' && !v('mNum'))) {
+      msg.style.color = '#c62828'; msg.textContent = '⚠️ Preencha todos os campos.'; return;
+    }
+    dados.push({ data: new Date(), modelo: v('mModelo'), pat: v('mPat'), sn: v('mSn'), chamado: v('mCh') === 'Sim' ? v('mNum') : 'Não', destino: v('mDest'), analista: '', status: 'Pendente' });
+    ['mModelo','mPat','mSn','mNum'].forEach(id => document.getElementById(id).value = '');
+    ['mDest','mCh'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('lNum').style.display = 'none';
+    msg.style.color = '#18864b'; msg.textContent = '✅ Equipamento registrado e enviado ao Field.';
+    render();
+  });
+
+  render();
+</script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Catálogo de Notebooks — Demo</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,Inter,Arial,sans-serif;background:#fafafa;color:#111}
+  header{background:#111;color:#fff;padding:28px 24px;text-align:center}
+  header h1{margin:0;font-size:26px}
+  header p{margin:6px 0 0;color:#a3a3a3;font-size:14px}
+  .demo{display:inline-block;margin-top:12px;font-size:11px;background:#262626;padding:5px 10px;border-radius:999px;color:#d4d4d4}
+  .filtros{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding:18px}
+  .filtros button{border:1px solid #e5e5e5;background:#fff;border-radius:999px;padding:8px 16px;cursor:pointer;font-size:13px}
+  .filtros button.on{background:#111;color:#fff;border-color:#111}
+  .grid{max-width:1100px;margin:0 auto;padding:0 18px 40px;display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:18px}
+  .p{background:#fff;border-radius:16px;overflow:hidden;border:1px solid #eee;display:flex;flex-direction:column;transition:.2s}
+  .p:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,.08)}
+  .img{height:160px;display:flex;align-items:center;justify-content:center;position:relative}
+  .img svg{width:120px}
+  .tag{position:absolute;top:10px;left:10px;background:#fff;font-size:11px;padding:4px 8px;border-radius:6px;font-weight:700}
+  .tag.esgotado{background:#ef4444;color:#fff}
+  .info{padding:16px;display:flex;flex-direction:column;gap:6px;flex:1}
+  .info h3{margin:0;font-size:16px}
+  .specs{color:#737373;font-size:12px;line-height:1.5}
+  .preco{font-size:22px;font-weight:800;margin-top:auto;padding-top:8px}
+  .preco small{font-size:12px;color:#737373;font-weight:400;display:block}
+  .wpp{display:block;text-align:center;background:#25d366;color:#fff;text-decoration:none;border-radius:10px;padding:11px;font-weight:700;font-size:14px;margin-top:8px}
+  .wpp.off{background:#d4d4d4;pointer-events:none}
+  .nota{text-align:center;color:#a3a3a3;font-size:12px;padding-bottom:30px}
+</style>
+</head>
+<body>
+<header>
+  <h1>💻 Loja Demo · Notebooks</h1>
+  <p>Notebooks revisados com garantia</p>
+  <span class="demo">Demo · o catálogo real lê os produtos de uma planilha do Google</span>
+</header>
+<div class="filtros" id="filtros"></div>
+<div class="grid" id="grid"></div>
+<p class="nota">Botões de WhatsApp desativados nesta demonstração.</p>
+
+<script>
+  // No projeto real, estes dados vêm de uma planilha do Google Sheets.
+  const produtos = [
+    { nome: 'Notebook Pro 14', marca: 'Marca A', cpu: 'Core i5 · 11ª geração', ram: '16 GB', ssd: '256 GB SSD', tela: '14" Full HD', preco: 2299, cor: '#dbeafe', estoque: 3 },
+    { nome: 'Notebook Office 15', marca: 'Marca B', cpu: 'Core i5 · 10ª geração', ram: '8 GB', ssd: '256 GB SSD', tela: '15,6" HD', preco: 1699, cor: '#fce7f3', estoque: 5 },
+    { nome: 'Ultrabook Slim 13', marca: 'Marca C', cpu: 'Core i7 · 11ª geração', ram: '16 GB', ssd: '512 GB SSD', tela: '13,3" Full HD', preco: 3199, cor: '#dcfce7', estoque: 1 },
+    { nome: 'Notebook Business 14', marca: 'Marca A', cpu: 'Ryzen 5 Pro', ram: '16 GB', ssd: '512 GB SSD', tela: '14" Full HD', preco: 2599, cor: '#fef3c7', estoque: 2 },
+    { nome: 'Notebook Essencial 15', marca: 'Marca B', cpu: 'Core i3 · 10ª geração', ram: '8 GB', ssd: '240 GB SSD', tela: '15,6" HD', preco: 1299, cor: '#ede9fe', estoque: 0 },
+    { nome: 'Workstation 15', marca: 'Marca C', cpu: 'Core i7 · 10ª geração', ram: '32 GB', ssd: '1 TB SSD', tela: '15,6" Full HD', preco: 4299, cor: '#e0f2fe', estoque: 1 }
+  ];
+
+  const laptop = c => `<svg viewBox="0 0 120 80"><rect x="18" y="6" width="84" height="54" rx="4" fill="#1f2937"/><rect x="22" y="10" width="76" height="46" rx="2" fill="${c}"/><path d="M6 62h108l-6 10H12z" fill="#9ca3af"/><rect x="50" y="62" width="20" height="3" rx="1.5" fill="#6b7280"/></svg>`;
+  const brl = v => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  let filtro = 'Todos';
+
+  function render() {
+    const marcas = ['Todos', ...new Set(produtos.map(p => p.marca))];
+    document.getElementById('filtros').innerHTML = marcas.map(m => `<button class="${m === filtro ? 'on' : ''}" data-m="${m}">${m}</button>`).join('');
+    document.querySelectorAll('[data-m]').forEach(b => b.onclick = () => { filtro = b.dataset.m; render(); });
+
+    document.getElementById('grid').innerHTML = produtos.filter(p => filtro === 'Todos' || p.marca === filtro).map(p => `
+      <div class="p">
+        <div class="img" style="background:${p.cor}">${laptop('#fff')}
+          <span class="tag ${p.estoque ? '' : 'esgotado'}">${p.estoque ? (p.estoque === 1 ? 'Última unidade' : p.estoque + ' disponíveis') : 'Esgotado'}</span></div>
+        <div class="info">
+          <h3>${p.nome}</h3>
+          <div class="specs">${p.cpu}<br>${p.ram} · ${p.ssd}<br>${p.tela}</div>
+          <div class="preco">${brl(p.preco)}<small>ou 10x de ${brl(p.preco / 10)}</small></div>
+          <a class="wpp ${p.estoque ? '' : 'off'}" href="#" onclick="return false">${p.estoque ? '💬 Quero este no WhatsApp' : 'Indisponível'}</a>
+        </div>
+      </div>`).join('');
+  }
+  render();
+</script>
+</body>
+</html>

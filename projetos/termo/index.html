@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Termo de Formatação — Demo</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Roboto,-apple-system,Arial,sans-serif;background:#f0ebf8;color:#202124}
+  .wrap{max-width:680px;margin:0 auto;padding:24px 14px 60px}
+  .card{background:#fff;border-radius:10px;border:1px solid #dadce0;padding:22px 24px;margin-bottom:12px}
+  .head{border-top:10px solid #673ab7}
+  .head h1{margin:0 0 8px;font-size:28px;font-weight:400}
+  .head p{margin:0;color:#5f6368;font-size:14px;line-height:1.5}
+  .demo{display:inline-block;background:#ede7f6;color:#5e35b1;font-size:11px;padding:4px 10px;border-radius:999px;margin-top:10px}
+  .q{font-size:15px;margin-bottom:14px}
+  .q span{color:#d93025}
+  input[type=text],input[type=email]{width:100%;border:0;border-bottom:1px solid #dadce0;padding:8px 0;font-size:14px;outline:none;font-family:inherit}
+  input[type=text]:focus,input[type=email]:focus{border-bottom:2px solid #673ab7}
+  .op{display:flex;align-items:center;gap:12px;padding:7px 0;font-size:14px;cursor:pointer}
+  .op input{width:18px;height:18px;accent-color:#673ab7}
+  .foto{border:1px dashed #dadce0;border-radius:8px;padding:18px;text-align:center;color:#5f6368;font-size:13px;cursor:pointer}
+  .foto.ok{border-color:#673ab7;color:#673ab7;background:#f6f2fc}
+  .btn{background:#673ab7;color:#fff;border:0;border-radius:4px;padding:10px 24px;font-size:14px;cursor:pointer}
+  .erro{color:#d93025;font-size:13px;margin-left:12px}
+  .res{display:none}
+  .res.on{display:block}
+  .steps{display:flex;flex-direction:column;gap:10px}
+  .step{display:flex;gap:12px;align-items:flex-start;font-size:14px;opacity:.3;transition:.4s}
+  .step.on{opacity:1}
+  .step b{width:26px;height:26px;border-radius:50%;background:#673ab7;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+  .pdf{border:1px solid #dadce0;border-radius:6px;padding:26px;font-size:13px;line-height:1.7;margin-top:14px;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,.08)}
+  .pdf h2{text-align:center;font-size:16px;margin:0 0 16px;letter-spacing:.5px}
+  .pdf .sig{margin-top:30px;display:flex;justify-content:space-between;gap:20px}
+  .pdf .sig div{flex:1;border-top:1px solid #333;text-align:center;padding-top:4px;font-size:11px}
+  .mail{margin-top:14px;background:#f8f9fa;border-radius:8px;padding:14px;font-size:13px;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card head">
+    <h1>Termo de Formatação de Equipamento</h1>
+    <p>Registro da formatação com checklist. Ao enviar, o sistema gera o termo em PDF e envia por e-mail ao colaborador, com o analista em cópia.</p>
+    <span class="demo">Demo · Google Forms + Apps Script · dados fictícios</span>
+  </div>
+
+  <div id="form">
+    <div class="card"><div class="q">Nome do colaborador <span>*</span></div><input type="text" id="nome" placeholder="Sua resposta"></div>
+    <div class="card"><div class="q">E-mail do colaborador <span>*</span></div><input type="email" id="email" placeholder="nome@empresa-demo.com"></div>
+    <div class="card"><div class="q">Patrimônio do equipamento <span>*</span></div><input type="text" id="pat" placeholder="Sua resposta"></div>
+    <div class="card">
+      <div class="q">Checklist da formatação <span>*</span></div>
+      <label class="op"><input type="checkbox" class="ck"> Backup dos arquivos realizado</label>
+      <label class="op"><input type="checkbox" class="ck"> Sistema operacional reinstalado</label>
+      <label class="op"><input type="checkbox" class="ck"> Equipamento ingressado no domínio</label>
+      <label class="op"><input type="checkbox" class="ck"> Softwares padrão instalados</label>
+      <label class="op"><input type="checkbox" class="ck"> Criptografia de disco ativa</label>
+    </div>
+    <div class="card"><div class="q">Foto do equipamento</div><div class="foto" id="foto">📷 Toque para anexar uma foto</div></div>
+    <div><button class="btn" id="enviar">Enviar</button><span class="erro" id="erro"></span></div>
+  </div>
+
+  <div class="res" id="res">
+    <div class="card">
+      <div class="q" style="font-size:18px">✅ Resposta registrada</div>
+      <div class="steps">
+        <div class="step"><b>1</b><div>Resposta gravada na planilha</div></div>
+        <div class="step"><b>2</b><div>Termo gerado em PDF a partir do modelo</div></div>
+        <div class="step"><b>3</b><div>E-mail enviado ao colaborador com o analista em cópia</div></div>
+      </div>
+      <div class="pdf" id="pdf" style="display:none"></div>
+      <div class="mail" id="mail" style="display:none"></div>
+      <button class="btn" id="novo" style="margin-top:16px">Enviar outra resposta</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const $ = id => document.getElementById(id);
+  $('foto').onclick = () => { $('foto').classList.add('ok'); $('foto').textContent = '📎 foto_equipamento.jpg anexada'; };
+
+  $('enviar').onclick = () => {
+    const nome = $('nome').value.trim(), email = $('email').value.trim(), pat = $('pat').value.trim();
+    const cks = [...document.querySelectorAll('.ck')];
+    if (!nome || !email || !pat) { $('erro').textContent = 'Preencha os campos obrigatórios.'; return; }
+    if (!cks.some(c => c.checked)) { $('erro').textContent = 'Marque o checklist.'; return; }
+    $('erro').textContent = '';
+    const data = new Date().toLocaleDateString('pt-BR');
+    const itens = cks.map(c => (c.checked ? '☑ ' : '☐ ') + c.parentElement.textContent.trim()).join('<br>');
+
+    $('pdf').innerHTML = `<h2>TERMO DE FORMATAÇÃO DE EQUIPAMENTO</h2>
+      Declaro que o equipamento de patrimônio <b>${pat}</b> foi formatado em <b>${data}</b>, conforme o checklist abaixo:<br><br>${itens}<br><br>
+      Colaborador: <b>${nome}</b><div class="sig"><div>Colaborador</div><div>Analista responsável</div></div>`;
+    $('mail').innerHTML = `<b>Para:</b> ${email}<br><b>Cc:</b> analista@empresa-demo.com<br><b>Assunto:</b> Termo de formatação · Patrimônio ${pat}<br><b>Anexo:</b> 📄 Termo_${pat}.pdf`;
+
+    $('form').style.display = 'none';
+    $('res').classList.add('on');
+    const steps = document.querySelectorAll('.step');
+    steps.forEach((s, i) => setTimeout(() => {
+      s.classList.add('on');
+      if (i === 1) $('pdf').style.display = 'block';
+      if (i === 2) $('mail').style.display = 'block';
+    }, 400 + i * 700));
+  };
+
+  $('novo').onclick = () => {
+    ['nome','email','pat'].forEach(id => $(id).value = '');
+    document.querySelectorAll('.ck').forEach(c => c.checked = false);
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('on'));
+    $('pdf').style.display = $('mail').style.display = 'none';
+    $('foto').classList.remove('ok'); $('foto').textContent = '📷 Toque para anexar uma foto';
+    $('res').classList.remove('on'); $('form').style.display = 'block';
+  };
+</script>
+</body>
+</html>

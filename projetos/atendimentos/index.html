@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>App de Atendimentos — Demo</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;font-family:-apple-system,Inter,Arial,sans-serif;background:radial-gradient(circle at 20% 20%,#1d4ed8 0,#0b1023 55%);color:#fff;display:flex;align-items:center;justify-content:center;gap:48px;padding:30px;flex-wrap:wrap}
+  .info{max-width:330px}
+  .info h1{font-size:28px;margin:0 0 10px}
+  .info p{color:#c7d2fe;line-height:1.6;font-size:14px}
+  .qr{background:#fff;border-radius:16px;padding:14px;display:inline-block;margin-top:10px}
+  .qr small{display:block;text-align:center;color:#111;font-size:11px;margin-top:6px;font-weight:700}
+  .tag{display:inline-block;background:rgba(255,255,255,.12);padding:5px 10px;border-radius:999px;font-size:11px;margin-bottom:14px}
+  .phone{width:300px;height:600px;background:#000;border-radius:44px;padding:12px;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+  .screen{width:100%;height:100%;background:#f5f6fa;border-radius:34px;overflow:hidden;color:#1f2937;display:flex;flex-direction:column;position:relative}
+  .bar{background:#1a73e8;color:#fff;padding:34px 16px 14px;font-weight:700;font-size:16px;display:flex;justify-content:space-between;align-items:center}
+  .bar span{font-size:12px;font-weight:400;opacity:.85}
+  .view{flex:1;overflow-y:auto;padding:14px}
+  .hero{height:150px;border-radius:16px;background:linear-gradient(135deg,#1a73e8,#7c3aed);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;color:#fff;box-shadow:0 10px 25px rgba(26,115,232,.3);margin-bottom:16px;transition:.2s}
+  .hero:active{transform:scale(.98)}
+  .hero b{font-size:22px}
+  .hero small{opacity:.85;font-size:12px;margin-top:4px}
+  .item{background:#fff;border-radius:12px;padding:12px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.05);font-size:13px}
+  .item b{display:block;margin-bottom:3px}
+  .item small{color:#6b7280}
+  .h{font-size:12px;color:#6b7280;font-weight:700;text-transform:uppercase;margin:6px 0 10px}
+  label{display:block;font-size:12px;color:#6b7280;margin-bottom:10px}
+  input,select,textarea{width:100%;margin-top:5px;border:1px solid #d1d5db;border-radius:10px;padding:10px;font-family:inherit;font-size:13px;background:#fff}
+  textarea{height:70px;resize:none}
+  .save{width:100%;height:44px;border:0;border-radius:10px;background:#1a73e8;color:#fff;font-weight:700;margin-top:4px;cursor:pointer}
+  .back{background:none;border:0;color:#fff;font-size:20px;cursor:pointer;padding:0}
+  .toast{position:absolute;left:16px;right:16px;bottom:20px;background:#111827;color:#fff;padding:12px;border-radius:12px;font-size:13px;text-align:center;opacity:0;transition:.3s}
+  .toast.on{opacity:1}
+</style>
+</head>
+<body>
+<div class="info">
+  <span class="tag">Demo · AppSheet · dados fictícios</span>
+  <h1>📱 App de Atendimentos</h1>
+  <p>Registro de atendimentos que não têm chamado aberto. O técnico escaneia o QR Code, toca em <b>Clique aqui</b> e registra em segundos pelo celular. Tudo cai numa planilha para virar indicador.</p>
+  <div class="qr"><svg id="qr" width="130" height="130"></svg><small>QR Code ilustrativo</small></div>
+</div>
+
+<div class="phone">
+  <div class="screen">
+    <div class="bar" id="bar"><span id="barTitle" style="font-size:16px;font-weight:700;opacity:1">Atendimentos</span><span id="cont"></span></div>
+    <div class="view" id="home">
+      <div class="hero" id="novo"><b>👆 Clique aqui</b><small>para registrar um atendimento</small></div>
+      <div class="h">Registros de hoje</div>
+      <div id="lista"></div>
+    </div>
+    <div class="view" id="form" style="display:none">
+      <label>Técnico<select id="fTec"><option>Ana Ribeiro</option><option>Bruno Lima</option><option>Carla Mendes</option></select></label>
+      <label>Colaborador atendido<input id="fCol" placeholder="Nome do colaborador"></label>
+      <label>Tipo<select id="fTipo"><option>Dúvida</option><option>Periférico</option><option>Acesso / senha</option><option>Rede / Wi-Fi</option><option>Impressora</option></select></label>
+      <label>Local<select id="fLoc"><option>Andar 1</option><option>Andar 2</option><option>Recepção</option><option>Sala de reunião</option></select></label>
+      <label>Descrição<textarea id="fDesc" placeholder="O que foi feito?"></textarea></label>
+      <button class="save" id="fSave">Salvar</button>
+    </div>
+    <div class="toast" id="toast">✅ Atendimento registrado</div>
+  </div>
+</div>
+
+<script>
+  const lista = [
+    { tec: 'Ana Ribeiro', col: 'João P.', tipo: 'Periférico', loc: 'Andar 2', hora: '09:12' },
+    { tec: 'Bruno Lima', col: 'Marina S.', tipo: 'Acesso / senha', loc: 'Andar 1', hora: '10:40' },
+    { tec: 'Carla Mendes', col: 'Rafael T.', tipo: 'Rede / Wi-Fi', loc: 'Sala de reunião', hora: '11:05' }
+  ];
+  const $ = id => document.getElementById(id);
+  const icones = { 'Dúvida': '💬', 'Periférico': '🖱️', 'Acesso / senha': '🔑', 'Rede / Wi-Fi': '📶', 'Impressora': '🖨️' };
+
+  function render() {
+    $('lista').innerHTML = [...lista].reverse().map(x => `<div class="item"><b>${icones[x.tipo]} ${x.tipo} · ${x.col}</b><small>${x.tec} · ${x.loc} · ${x.hora}</small></div>`).join('');
+    $('cont').textContent = lista.length + ' hoje';
+  }
+  function tela(form) {
+    $('home').style.display = form ? 'none' : 'block';
+    $('form').style.display = form ? 'block' : 'none';
+    $('barTitle').innerHTML = form ? '<button class="back" id="voltar">←</button> Novo atendimento' : 'Atendimentos';
+    if (form) $('voltar').onclick = () => tela(false);
+  }
+  $('novo').onclick = () => tela(true);
+  $('fSave').onclick = () => {
+    if (!$('fCol').value.trim()) { $('fCol').focus(); return; }
+    const h = new Date();
+    lista.push({ tec: $('fTec').value, col: $('fCol').value.trim(), tipo: $('fTipo').value, loc: $('fLoc').value, hora: h.toTimeString().slice(0, 5) });
+    $('fCol').value = ''; $('fDesc').value = '';
+    tela(false); render();
+    $('toast').classList.add('on'); setTimeout(() => $('toast').classList.remove('on'), 1800);
+  };
+
+  // QR Code ilustrativo (padrão decorativo, não é um código real)
+  (function () {
+    const n = 25, c = 130 / n, svg = $('qr');
+    let s = 11, out = '';
+    const r = () => { s = (s * 16807) % 2147483647; return s % 2; };
+    const finder = (x, y) => (x < 7 && y < 7) || (x >= n - 7 && y < 7) || (x < 7 && y >= n - 7);
+    for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) {
+      let on;
+      if (finder(x, y)) {
+        const fx = x % (n - 7) < 7 ? x % (n - 7) : x, fy = y % (n - 7) < 7 ? y % (n - 7) : y;
+        const a = x >= n - 7 ? x - (n - 7) : x, b = y >= n - 7 ? y - (n - 7) : y;
+        on = a === 0 || a === 6 || b === 0 || b === 6 || (a >= 2 && a <= 4 && b >= 2 && b <= 4);
+      } else on = r();
+      if (on) out += `<rect x="${x * c}" y="${y * c}" width="${c + .3}" height="${c + .3}"/>`;
+    }
+    svg.innerHTML = `<g fill="#111">${out}</g>`;
+  })();
+
+  render();
+</script>
+</body>
+</html>
